@@ -1,5 +1,1 @@
-# CS 461 (sp23) repo for NetID: yclai4
-
-GitHub username at initialization time: LaiEthanLai
-
-For next steps, please refer to the instructions provided by your course.
+# CS 461 (SP23) repo for  [Sam Wang](https://github.com/SamWang0807) and [LaiEthanLai](https://github.com/LaiEthanLai).
