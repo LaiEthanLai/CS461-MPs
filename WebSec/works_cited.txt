@@ -1,0 +1,21 @@
+Cite sources you conslulted for this MP here:
+https://www.w3schools.com/jquery/jquery_events.asp
+https://dev.mysql.com/doc/refman/8.0/en/sorting-rows.html
+https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/encodeURIComponent
+https://www.w3schools.com/jsref/met_doc_getelementsbyname.asp
+https://www.w3schools.com/jsref/coll_doc_forms.asp
+https://stackoverflow.com/questions/13259843/submitting-a-form-in-an-iframe-with-javascript
+https://www.invicti.com/blog/web-security/sql-injection-cheat-sheet/
+https://www.w3schools.com/html/html_iframe.asp
+https://codepen.io/balatd/pen/VwabrZg
+https://stackoverflow.com/questions/9347282/using-jquery-preventing-form-from-submitting
+https://research.cs.wisc.edu/mist/SoftwareSecurityCourse/Chapters/3_8_1-SQL-Injections.pdf
+https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html
+https://naveenroy008.medium.com/xss-attacks-via-svg-images-a2835c0cb7c9
+https://portswigger.net/web-security/cross-site-scripting/cheat-sheet
+https://github.com/payloadbox/sql-injection-payload-list
+https://www.w3resource.com/javascript-exercises/fundamental/javascript-fundamental-exercise-171.php
+https://www.cobalt.io/blog/a-pentesters-guide-to-cross-site-scripting-xss
+https://developer.mozilla.org/zh-TW/docs/Web/API/btoa
+https://developer.mozilla.org/en-US/docs/Web/API/atob
+https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/eval

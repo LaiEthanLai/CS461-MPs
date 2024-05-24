@@ -1,0 +1,11 @@
+proj2_inject3 
+8.0.32-0ubuntu0.22.04.2
+HINT,SECRET,foo,inject3_users 
+luyjhpqtkf 
+
+https://www.invicti.com/blog/web-security/sql-injection-cheat-sheet/#UnionInjections
+https://portswigger.net/web-security/sql-injection/union-attacks
+https://dev.mysql.com/doc/refman/8.0/en/information-schema-table-reference.html
+https://github.com/payloadbox/sql-injection-payload-list
+https://database.guide/how-to-return-query-results-as-a-comma-separated-list-in-mysql/
+https://dev.mysql.com/doc/refman/8.0/en/information-schema-columns-table.html

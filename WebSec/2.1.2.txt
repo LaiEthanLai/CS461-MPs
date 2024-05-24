@@ -1,0 +1,2 @@
+CREATE TABLE if not exists users (id int UNSIGNED NOT NULL AUTO_INCREMENT, username varchar(32) NOT NULL, unique key unique_username(username), password varchar(64) NOT NULL, passwordhash varchar(64) NOT NULL,PRIMARY KEY (id) );
+CREATE TABLE if not exists history (id int UNSIGNED NOT NULL AUTO_INCREMENT, user_id int UNSIGNED NOT NULL, query varchar(2048) NOT NULL,PRIMARY KEY (id),INDEX (user_id));

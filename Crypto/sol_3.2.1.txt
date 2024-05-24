@@ -1,0 +1,1 @@
+token%3D43966ca8c517c882e70a70e48fa4d747%26user%3Dadmin%26command1%3DListFiles%26command2%3DNoOp%80%00%00%00%A0%01%00%00%00%00%00%00%26command3%3DDeleteAllFiles

